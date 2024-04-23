@@ -116,7 +116,7 @@ st.markdown(
 
 )
 
-st.image("../data/images/cpg_product_research.png")
+st.image("../data/images/process_flow.png")
 
 st.markdown(
     """

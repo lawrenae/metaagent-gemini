@@ -147,13 +147,13 @@ allure-results
 .idea
 .DS_Store
 .vscode
-
 log.txt
 docs/scripts/set_env.sh
 key.yaml
+README.pdf
 output.json
-data
-data/output_add.json
+data/pdfs
+data/tutorial_docx
 data.ms
 frontend/nb/
 .chroma

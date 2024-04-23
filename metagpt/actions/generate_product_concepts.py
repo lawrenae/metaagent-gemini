@@ -8,7 +8,6 @@
 from typing import List
 
 from metagpt.actions import Action, ActionOutput
-from metagpt.actions.search_and_summarize import SearchAndSummarize
 from metagpt.config import CONFIG
 from metagpt.const import RESEARCH_PATH
 from metagpt.logs import logger

@@ -46,45 +46,9 @@
 
 
 
- ###  The title of the chart is "Sunscreen" 
-
- ![ The title of the chart is "Sunscreen"](/Users/asanthan/work/development/llm/MetaGPT/data/images/flow_chart.png) 
-
- ### Summary
- - The survey was conducted among 1,000 people in the United States.
-- 60% of the respondents were female and 40% were male.
-- The majority of the respondents were between the ages of 18 and 34.
-- The most popular sunscreen brands were Neutrogena, Coppertone, and Banana Boat.
-- The most important factors when choosing a sunscreen were price, SPF, and effectiveness.
-- The majority of the respondents were satisfied with their current sunscreen.
-
-
-
- ###  Sunscreen Development Process 
-
- ![ Sunscreen Development Process](/Users/asanthan/work/development/llm/MetaGPT/data/images/cpg_product_research.png) 
-
- ### Summary
- * Sunscreen is a popular product with a large market.
-* There is a growing demand for natural and organic sunscreens.
-* Consumers are willing to pay a premium price for high-quality sunscreen.
-
-
-
- ###  The Sunscreen Data 
-
- ![ The Sunscreen Data](/Users/asanthan/work/development/llm/MetaGPT/data/images/Minions.png) 
-
- ### Summary
- - Sunscreen is a product that is used to protect the skin from the sun's ultraviolet rays.
-- It is important to use sunscreen when spending time outdoors, as it can help to prevent skin cancer and other skin damage.
-- There are many different types of sunscreen available, so it is important to choose one that is right for your skin type and needs.
-
-
-
  ###  Sunscreen Revenue Comparison by Country 2023. 
 
- ![ Sunscreen Revenue Comparison by Country 2023.](/Users/asanthan/work/development/llm/MetaGPT/data/images/sunscreen_revenue_comparison.png) 
+ ![ Sunscreen Revenue Comparison by Country 2023.](../charts/sunscreen_revenue_comparison.png) 
 
  ### Summary
  - The United States is the largest market for sunscreen, followed by China and South Korea.
@@ -95,7 +59,7 @@
 
  ###  Sunscreen Market Share 
 
- ![ Sunscreen Market Share](/Users/asanthan/work/development/llm/MetaGPT/data/images/brand_shares_ww.png) 
+ ![ Sunscreen Market Share](../charts/brand_shares_ww.png) 
 
  ### Summary
  1. Other brands hold the largest market share in sunscreen sales at 27%.
@@ -110,7 +74,7 @@
 
  ###  Sunscreen Market Revenue 
 
- ![ Sunscreen Market Revenue](/Users/asanthan/work/development/llm/MetaGPT/data/images/revenue_trends_ww.png) 
+ ![ Sunscreen Market Revenue](../charts/revenue_trends_ww.png) 
 
  ### Summary
  - The sunscreen market is growing and is expected to reach $13.55 billion by 2028.
