@@ -24,14 +24,20 @@ RPM: 10
 
 #### if Google VertexAI
 GCP_PROJECT_ID: "greenfielddemos"
-GCP_SPECIAL_PROJECT_ID: "cloud-llm-preview1"
 GCP_LOCATION: "us-central1"
-GCP_MODEL_REGULAR: "text-bison"
-GCP_MODEL_LARGE: "text-bison"
-GCP_MODEL_MM: "gemini-pro"
-GCP_MODEL_MMV: "gemini-pro-vision"
+
+# Palm Specific
+GCP_MODEL_REGULAR_PALM: "text-bison"
+GCP_MODEL_LARGE_PALM: "text-bison"
+
+# Gemini Specific
+GCP_MODEL_GEMINI: "gemini-1.5-pro"
+# GCP_MODEL_GEMINI: "gemini-1.5-flash-001"
+# GCP_MODEL_GEMINI: "gemini-experimental"
+
 GCP_ES_STORE: "cpg-research-docs-v1_1701270367059"
 GCP_ES_PROJECT: "greenfielddemos"
+
 CPG_RESEARCH_QUESTIONS: "3"
 CPG_RESEARCH_SECTION: "['Core functions', 'ideal product/service/experience', 'consumer satisfaction','current gaps', 'market trends', 'market size','key technology and scientific advancements']"
 

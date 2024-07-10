@@ -1,7 +1,7 @@
 # MetaGemini: The Multi-Agent Framework Concept for VertexAI LLM's
 
 <p align="center">
-<a href=""><img src="frontend/image.png" alt="MetaGPT logo: Enable Vertex AI to work in a CPG company, collaborating to tackle more complex tasks." width="150px"></a>
+<a href=""><img src="frontend/image.png" alt="MetaGemini logo: Enable Vertex AI to work in a CPG company, collaborating to tackle more complex tasks." width="150px"></a>
 </p>
 
 I was inspired by the Demonstration showcased @ Next  on leveraging LLM for complex tasks
@@ -11,9 +11,19 @@ I was inspired by the Demonstration showcased @ Next  on leveraging LLM for comp
 
 
 
-1. In this prototype, i have customized MetaGPT and ported to support VertexAI as the LLM provider to take a **one line requirement** as input and outputs ** Whitespace Analysis Dossier , Generates Consumer Research Analysis and finally generates the Concept Development Document.**
-2. Internally, MetaGemini Concept includes **product research analyst / market researcher / product concept developer.** It provides the entire process of a **software company along with carefully orchestrated SOPs.**
-   1. `Code = SOP(Team)` is the core philosophy. We materialize SOP and apply it to teams composed of LLMs.
+In this prototype, I have customized [MetaGPT](https://github.com/geekan/MetaGPT) and ported to support VertexAI as the LLM provider to take a **one line requirement** as input and outputs
+   * A Whitespace Analysis Dossier
+   * A generated Consumer Research Analysis document
+   * A generated the Concept Development Document.
+
+Internally, MetaGemini Concept includes
+   * product research analyst
+   * market researcher
+   * product concept developer.
+
+It provides the entire process of a **software company along with carefully orchestrated SOPs.**
+
+### `Code = SOP(Team)` is the core philosophy. We materialize the SOP and apply it to teams composed of LLMs.
 
 ![A CPG company consists of LLM-based roles](data/images/cpg_product_research.png)
 
@@ -33,15 +43,14 @@ These SOPs, which play a pivotal role in task decomposition and efficient coordi
 
 ## Agent Concept
 
-Like depicted in the schematic above , idea of the framework is to create a foundation for Agents specialized in performing specific skills , in our example CPG Product Research Agent is trained or customized to perform
-specialized tasks which has the following skills. 
+Like depicted in the schematic above, the idea of the framework is to create a foundation for Agents specialized in performing specific skills, in our example CPG Product Research Agent is trained or customized to perform specialized tasks which has the following skills. 
 
 - Whitespace Analysis 
 - Creative Thinking
 - Creative Content Generation
 
-These skills are like lego blocks , where we can customize each of them for various applications like CPG Research , Financial Analysis , Product troubleshooting etc
-Using the framework we have demonstrated how we can create a common catalog of skill based agents , which can then be used by Enterprise to perform various specialized tasks.
+These skills are like lego blocks, where we can customize each of them for various applications like **CPG Research**, **Financial Analysis**, **Product troubleshooting**, etc.
+Using the framework we have demonstrated how we can create a common catalog of skill based agents, which can then be used by Enterprise to perform various specialized tasks.
 
 
 ## MetaGemini Abilities
@@ -55,7 +64,7 @@ Using the framework we have demonstrated how we can create a common catalog of s
 
 ## MetaGemini Architecture
 
-MetaGPT is just a concept , in order to take the concept idea to production , there are several gaps which we need to address 
+MetaGemini is just a concept, in order to take the concept idea to production, there are several gaps which we need to address
 
 - Make it distributable
 - Make it Standardized to develop Agents with Specialized skills
@@ -63,7 +72,7 @@ MetaGPT is just a concept , in order to take the concept idea to production , th
 - Catalog to discovering and publishing for Developers
 - UI to configure the agents
 
-As a part of continuation of this concept , here is architecture blueprint to address the gaps listed above. There are primarily three major components
+As a part of continuation of this concept, here is architecture blueprint to address the gaps listed above. There are primarily three major components
 
 - UI for developers and users to configure the LLM based Task Agent
 - Back end service for managing LLM based Task Agents
@@ -115,14 +124,12 @@ pip install -r requirements.txt
 
 ## Configuration
 
-```
-Please update the following in config/config.yaml
+Please update the following in [config/config.yaml](config/config.yaml)
 
 | Variable Name                              | Value                           
 | ------------------------------------------ | ----------------------------------------- |
 | GCP_PROJECT_ID # text-bison model          | <project_id>                              |
-| GCP_SPECIAL_PROJECT_ID # gemini-pro        | <project_id_gemini>                       | 
-| GCP_LOCATION # gemini-pro                  | <us-cental1>                              | 
+| GCP_LOCATION                               | <us-cental1>                              |
 | GCP_MODEL_REGULAR # text-bison             | <model_name_regular>                      | 
 | GCP_MODEL_LARGE        # text-bison        | <model_name_large>                        | 
 | GCP_MODEL_MM           # gemini            | <model_name_multimodal>                   | 
@@ -131,8 +138,6 @@ Please update the following in config/config.yaml
 | GCP_ES_PROJECT         # greenfielddemos   | <vertex_search_projectId>                 | 
 | CPG_RESEARCH_SECTION # research_sections   | <research_sections>                       |
 | CPG_RESEARCH_QUESTIONS  # no.of question   | <research_question>                       |
-| ------------------------------------------ | ----------------------------------------- |
-```
 
 ## Tutorial: Initiating a startup (Locally)
 

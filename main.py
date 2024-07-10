@@ -6,22 +6,14 @@
 """
 
 
-import configparser
-from typing import Union, Optional
 
-from fastapi import FastAPI , Request
+from fastapi import FastAPI 
 from pydantic import BaseModel
-import asyncio
-from sse_starlette.sse import EventSourceResponse
-from metagpt.const import PROJECT_ROOT
 from metagpt.roles.cpg_product_researcher import RESEARCH_PATH, Researcher
 from metagpt.config import CONFIG
 
-from datetime import datetime
 import uvicorn
-from fastapi.middleware.cors import CORSMiddleware
-import time
-import os
+
 class Task(BaseModel):
     name: str
     topic: str

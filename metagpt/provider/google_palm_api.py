@@ -10,7 +10,7 @@ import time
 from typing import Optional,NamedTuple, Union
 import base64
 import vertexai.preview
-from vertexai.preview.language_models import TextGenerationModel
+from vertexai.generative_models import GenerativeModel, Part
 from typing import Optional
 from metagpt.config import CONFIG
 from metagpt.logs import logger
@@ -21,9 +21,6 @@ from metagpt.utils.token_counter import get_max_completion_tokens
 
 aiplatform.constants.base.API_BASE_PATH = "autopush-aiplatform.sandbox.googleapis.com"
 aiplatform.constants.base.PREDICTION_API_BASE_PATH = "autopush-aiplatform.sandbox.googleapis.com"
-
-from vertexai.preview import generative_models
-from vertexai.preview.generative_models import GenerativeModel, Image, Content, Part
 
 from google.cloud import discoveryengine_v1beta
 from google.cloud.discoveryengine_v1beta.services.search_service import pagers
@@ -150,12 +147,10 @@ class Palm2:
 
 
 
-    model = TextGenerationModel.from_pretrained(CONFIG.vertex_model)
-    modelLarge= TextGenerationModel.from_pretrained(CONFIG.vertex_model_large)
+    model = GenerativeModel(CONFIG.vertex_model_regular_palm)
+    modelLarge= GenerativeModel(CONFIG.vertex_model_large_palm)
 
     system_prompt = 'You are a helpful assistant.'
-
-
 
 
     def _user_msg(self, msg: str) -> dict[str, str]:
@@ -170,30 +165,21 @@ class Palm2:
         return self._system_msg(self.system_prompt)
 
     def ask(self, prompt):
-
         result = self.model.predict(prompt, **self.parameters)
-
         return result.text
 
     async def aask(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
-        if system_msgs:
-            message = str(self._system_msgs(system_msgs) + [self._user_msg(msg)])
-        else:
-            message = self._default_system_msg() + self._user_msg(msg)
-        result = self.model.predict(msg, **self.parameters)
-
-
-        logger.info(message)
-        logger.info(result.text)
-        return result.text
-
+        return self._aask(msg, self.parameters, self.model, system_msgs)
 
     async def aasklarge(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
+        return self._aask(msg, self.parametersLarge, self.modelLarge, system_msgs)
+
+    async def _aask(self, msg: str, parameters, model, system_msgs: Optional[list[str]] = None) -> str:
         if system_msgs:
             message = str(self._system_msgs(system_msgs) + [self._user_msg(msg)])
         else:
             message = self._default_system_msg() + self._user_msg(msg)
-        result = self.modelLarge.predict(msg, **self.parametersLarge)
+        result = model.predict(msg, **parameters)
 
 
         logger.info(message)
@@ -254,7 +240,7 @@ class Palm2:
 
 
     async def aasklargegemini(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
-        PROJECT_ID = CONFIG.vertex_special_project  # @param
+        PROJECT_ID = CONFIG.vertex_project # @param
         LOCATION = CONFIG.vertex_location  # @param
         vertexai.init(project=PROJECT_ID, location=LOCATION)
 
@@ -277,25 +263,20 @@ class Palm2:
         return str(result.candidates[0].content.parts[0].text)
 
     async def aasklargegeminimm(self, msg: str, img: str) -> str:
-            PROJECT_ID = CONFIG.vertex_special_project  # @param
-            LOCATION = CONFIG.vertex_location  # @param
-            vertexai.init(project=PROJECT_ID, location=LOCATION)
+        PROJECT_ID = CONFIG.vertex_project  # @param
+        LOCATION = CONFIG.vertex_location  # @param
+        vertexai.init(project=PROJECT_ID, location=LOCATION)
 
-            with open(img, "rb") as image_file:
-                image_data = image_file.read()
+        with open(img, "rb") as image_file:
+            image_data = image_file.read()
 
-            encoded_image = base64.b64encode(image_data).decode("utf-8")
+        # encoded_image = base64.b64encode(image_data).decode("utf-8")
+        # image = Part.from_data(data=base64.b64decode(encoded_image), mime_type="image/png")
+        image = Part.from_data(data=image_data, mime_type="image/png")
 
-            multimodal_model = GenerativeModel(CONFIG.vertex_model_mmv)
+        multimodal_model = GenerativeModel(CONFIG.vertex_model_gemini)
+        responses = multimodal_model.generate_content([msg, image])
 
-            image = generative_models.Part.from_data(data=base64.b64decode(encoded_image), mime_type="image/png")
+        print(responses.text)
 
-            responses = multimodal_model.generate_content([msg, image])
-
-            print(responses.text)
-
-            return responses.text
-
-
-
-
+        return responses.text

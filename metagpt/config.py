@@ -110,11 +110,9 @@ class Config(metaclass=Singleton):
         self.es_store_project = ""
         self.vertex_project=self._get("GCP_PROJECT_ID")
         self.vertex_location=self._get("GCP_LOCATION")
-        self.vertex_model=self._get("GCP_MODEL_REGULAR")
-        self.vertex_model_large=self._get("GCP_MODEL_LARGE")
-        self.vertex_model_mm=self._get("GCP_MODEL_MM")
-        self.vertex_model_mmv= self._get("GCP_MODEL_MMV")
-        self.vertex_special_project=self._get("GCP_SPECIAL_PROJECT_ID")
+        self.vertex_model_regular_palm=self._get("GCP_MODEL_REGULAR_PALM")
+        self.vertex_model_large_palm=self._get("GCP_MODEL_LARGE_PALM")
+        self.vertex_model_gemini=self._get("GCP_MODEL_GEMINI")
 
 
 
