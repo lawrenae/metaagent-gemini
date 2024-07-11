@@ -26,11 +26,6 @@ RPM: 10
 GCP_PROJECT_ID: "greenfielddemos"
 GCP_LOCATION: "us-central1"
 
-# Palm Specific
-GCP_MODEL_REGULAR_PALM: "gemini-1.5-pro"
-GCP_MODEL_LARGE_PALM: "gemini-1.5-pro"
-
-# Gemini Specific
 GCP_MODEL_GEMINI: "gemini-1.5-pro"
 # GCP_MODEL_GEMINI: "gemini-1.5-flash-001"
 # GCP_MODEL_GEMINI: "gemini-experimental"

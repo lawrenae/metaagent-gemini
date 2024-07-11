@@ -94,37 +94,21 @@ class EnterpriseSearchChain(Chain):
     def _chain_type(self) -> str:
         return "google_enterprise_search_chain"
 
-class Palm2:
-    PROJECT_ID = CONFIG.vertex_project  # @param
-    LOCATION = CONFIG.vertex_location  # @param
-    vertexai.init(project=PROJECT_ID, location=LOCATION)
-    parameters = {
-        "candidate_count": 1,
-        "max_output_tokens": 1024,
-        "temperature": 0,
-        "top_p": 0.8,
-        "top_k": 40
-    }
-
-    parametersLarge = {
-        "candidate_count": 1,
-        "max_output_tokens": 4096,
-        "temperature": 0.1,
-        "top_p": 0.8,
-        "top_k": 40
-    }
-
-    model = GenerativeModel(CONFIG.vertex_model_regular_palm)
-    modelLarge= GenerativeModel(CONFIG.vertex_model_large_palm)
-
+class Gemini:
     system_prompt = 'You are a helpful assistant.'
 
+    def __init__(self) -> None:
+        PROJECT_ID = CONFIG.vertex_project  # @param
+        LOCATION = CONFIG.vertex_location  # @param
+        vertexai.init(project=PROJECT_ID, location=LOCATION)
+        self.model = GenerativeModel(CONFIG.vertex_model_gemini)
 
     def _user_msg(self, msg: str) -> dict[str, str]:
         return msg
 
     def _system_msg(self, msg: str) -> dict[str, str]:
         return msg
+
     def _system_msgs(self, msgs: list[str]) -> list[dict[str, str]]:
         return [self._system_msg(msg) for msg in msgs]
 
@@ -132,23 +116,8 @@ class Palm2:
         return self._system_msg(self.system_prompt)
 
     def ask(self, prompt):
-        result = self.model.predict(prompt, **self.parameters)
-        return result.text
-
-    def aask(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
-        return self._aask(msg, self.model, system_msgs)
-
-    def aasklarge(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
-        return self._aask(msg, self.modelLarge, system_msgs)
-
-    def _aask(self, msg: str, model, system_msgs: Optional[list[str]] = None) -> str:
-        if system_msgs:
-            message = str(self._system_msgs(system_msgs) + [self._user_msg(msg)])
-        else:
-            message = self._default_system_msg() + self._user_msg(msg)
-
-        result = model.generate_content(
-            message,
+        result = self.model.generate_content(
+            prompt,
             generation_config={
                 "max_output_tokens": 8192,
                 "temperature": 0.9,
@@ -163,16 +132,26 @@ class Palm2:
             stream=False,
         )
 
-        logger.info(message)
+        logger.info(prompt)
         logger.info(result.text)
         return result.text
+
+    def aask(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
+        return self._aask(msg, system_msgs)
+
+    def _aask(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
+        if system_msgs:
+            message = str(self._system_msgs(system_msgs) + [self._user_msg(msg)])
+        else:
+            message = self._default_system_msg() + self._user_msg(msg)
+
+        return self.ask(message)
 
     async def aaskes(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
         logger.info ("Invoking Research Agent :" + CONFIG.vertex_project)
         GCP_PROJECT = CONFIG.vertex_project  # @param {type: "string"}
         SEARCH_ENGINE = CONFIG.es_store  # @param {type: "string"}
-        # LLM_MODEL = "text-bison@latest"  # @param {type: "string"}
-        LLM_MODEL = "gemini-1.5-pro"  # @param {type: "string"}
+        LLM_MODEL = CONFIG.vertex_model_gemini  # @param {type: "string"}
         MAX_OUTPUT_TOKENS = 1024  # @param {type: "integer"}
         TEMPERATURE = 0.0  # @param {type: "number"}
         TOP_P = 0.8  # @param {type: "number"}
@@ -205,12 +184,7 @@ class Palm2:
         msg = f"Summarize the page_content based on the relevance related to Question: {msg} from the context \n Context: \n Ignore non relevant text" + str(results) + "\n Summarize as Bullets with Source Information Answer:"
         print(msg)
 
-        PROJECT_ID = CONFIG.vertex_project # @param
-        LOCATION = CONFIG.vertex_location  # @param
-        vertexai.init(project=PROJECT_ID, location=LOCATION)
-        model = GenerativeModel(CONFIG.vertex_model_gemini)
-
-        result = model.generate_content(msg, generation_config={
+        result = self.model.generate_content(msg, generation_config={
                 "temperature": 0.01,
                 "top_p": 0.85,
                 "top_k": 20,
@@ -220,10 +194,10 @@ class Palm2:
             })
 
 
-        if system_msgs:
-            message = str(self._system_msgs(system_msgs))
-        else:
-            message = self._default_system_msg()
+        # if system_msgs:
+        #     message = str(self._system_msgs(system_msgs))
+        # else:
+        #     message = self._default_system_msg()
 
         # prompt = PromptTemplate(input_variables=['results'],
         #                         template=message)
@@ -235,16 +209,11 @@ class Palm2:
 
 
     async def aasklargegemini(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
-        PROJECT_ID = CONFIG.vertex_project # @param
-        LOCATION = CONFIG.vertex_location  # @param
-        vertexai.init(project=PROJECT_ID, location=LOCATION)
-
-        modelgemini=GenerativeModel(CONFIG.vertex_model_gemini)
         if system_msgs:
             message = str(self._system_msgs(system_msgs)) + " \n " + str([self._user_msg(msg)])
         else:
             message = self._default_system_msg() + " \n " + self._user_msg(msg)
-        result = modelgemini.generate_content(msg, generation_config={
+        result = self.model.generate_content(msg, generation_config={
         "temperature": 0.01,
         "top_p": 0.85,
         "top_k": 20,
@@ -258,10 +227,6 @@ class Palm2:
         return str(result.candidates[0].content.parts[0].text)
 
     async def aasklargegeminimm(self, msg: str, img: str) -> str:
-        PROJECT_ID = CONFIG.vertex_project  # @param
-        LOCATION = CONFIG.vertex_location  # @param
-        vertexai.init(project=PROJECT_ID, location=LOCATION)
-
         with open(img, "rb") as image_file:
             image_data = image_file.read()
 
@@ -269,8 +234,7 @@ class Palm2:
         # image = Part.from_data(data=base64.b64decode(encoded_image), mime_type="image/png")
         image = Part.from_data(data=image_data, mime_type="image/png")
 
-        multimodal_model = GenerativeModel(CONFIG.vertex_model_gemini)
-        responses = multimodal_model.generate_content([msg, image])
+        responses = self.model.generate_content([msg, image])
 
         print(responses.text)
 

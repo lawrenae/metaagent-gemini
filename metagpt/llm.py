@@ -9,7 +9,7 @@
 from metagpt.provider.anthropic_api import Claude2 as Claude
 #from metagpt.provider.openai_api import OpenAIGPTAPI as LLM
 
-from metagpt.provider.google_palm_api import Palm2 as LLM
+from metagpt.provider.google_palm_api import Gemini as LLM
 
 DEFAULT_LLM = LLM()
 CLAUDE_LLM = Claude()

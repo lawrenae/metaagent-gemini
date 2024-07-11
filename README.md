@@ -130,10 +130,8 @@ Please update the following in [config/config.yaml](config/config.yaml)
 | ------------------------------------------ | ----------------------------------------- |
 | GCP_PROJECT_ID                             | <project_id>                              |
 | GCP_LOCATION                               | <us-cental1>                              |
-| GCP_MODEL_REGULAR      # text-bison        | <model_name_regular>                      |
-| GCP_MODEL_LARGE        # text-bison        | <model_name_large>                        |
 | GCP_MODEL_MM           # gemini            | <model_name_multimodal>                   |
-| GCP_ES_STORE           # text-bison-32k    | <vertexsearch_id >                        |
+| GCP_ES_STORE           # search ai         | <vertexsearch_id >                        |
 | CPG_RESEARCH_SECTION   # research_sections | <research_sections>                       |
 | CPG_RESEARCH_QUESTIONS # no.of question    | <research_question>                       |
 
