@@ -117,7 +117,7 @@ class GenerateResearchQueries(Action):
             A dictionary containing the search questions as keys and the collected URLs as values.
         """
         system_text = system_text if system_text else RESEARCH_TOPIC_SYSTEM.format(topic=topic)
-        queries = await self._aask(GENERATE_RESEARCH_QUERY_PROMPT.format(topic=topic,decomposition_nums=decomposition_nums, research_areas=topic_research_area), [system_text])
+        queries = self._aask(GENERATE_RESEARCH_QUERY_PROMPT.format(topic=topic,decomposition_nums=decomposition_nums, research_areas=topic_research_area), [system_text])
         try:
             questions = OutputParser.extract_struct(queries, list)
             questionsDic = {}

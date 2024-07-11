@@ -7,52 +7,21 @@
 
 import asyncio
 import time
-from typing import Optional,NamedTuple, Union
-import base64
-import vertexai.preview
+from typing import Optional
+import vertexai
+import vertexai.generative_models as generative_models
 from vertexai.generative_models import GenerativeModel, Part
 from typing import Optional
 from metagpt.config import CONFIG
 from metagpt.logs import logger
 
-from google.cloud import aiplatform
-
-from metagpt.utils.token_counter import get_max_completion_tokens
-
-aiplatform.constants.base.API_BASE_PATH = "autopush-aiplatform.sandbox.googleapis.com"
-aiplatform.constants.base.PREDICTION_API_BASE_PATH = "autopush-aiplatform.sandbox.googleapis.com"
-
-from google.cloud import discoveryengine_v1beta
-from google.cloud.discoveryengine_v1beta.services.search_service import pagers
-from google.protobuf.json_format import MessageToDict
-import json
-from langchain.agents import AgentType, initialize_agent, AgentExecutor, LLMSingleActionAgent, AgentOutputParser
-from langchain.callbacks.manager import CallbackManagerForChainRun, Callbacks
+from langchain.callbacks.manager import CallbackManagerForChainRun
 from langchain.chains.base import Chain
-from langchain.chains.question_answering import load_qa_chain
-from langchain.chains import LLMChain, RetrievalQA, RetrievalQAWithSourcesChain
-from langchain.llms import VertexAI
-from langchain.llms.utils import enforce_stop_tokens
-from langchain.prompts import PromptTemplate
-from langchain.prompts import StringPromptTemplate
+from langchain.chains import LLMChain
 from langchain.retrievers import (
-    GoogleVertexAIMultiTurnSearchRetriever,
     GoogleVertexAISearchRetriever,
 )
-from langchain.schema import AgentAction, AgentFinish, Document, BaseRetriever
-from langchain.tools import Tool
-from langchain.utils import get_from_dict_or_env
-from pydantic import BaseModel, Extra, Field, root_validator
-import re
-from typing import Any, Mapping, List, Dict, Optional, Tuple, Sequence, Union
-import unicodedata
-from metagpt.utils.singleton import Singleton
-from metagpt.utils.token_counter import (
-    TOKEN_COSTS,
-    count_message_tokens,
-    count_string_tokens,
-    get_max_completion_tokens,
-)
+from typing import Any, List, Dict, Optional
 
 
 class RateLimiter:
@@ -145,8 +114,6 @@ class Palm2:
         "top_k": 40
     }
 
-
-
     model = GenerativeModel(CONFIG.vertex_model_regular_palm)
     modelLarge= GenerativeModel(CONFIG.vertex_model_large_palm)
 
@@ -168,29 +135,44 @@ class Palm2:
         result = self.model.predict(prompt, **self.parameters)
         return result.text
 
-    async def aask(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
-        return self._aask(msg, self.parameters, self.model, system_msgs)
+    def aask(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
+        return self._aask(msg, self.model, system_msgs)
 
-    async def aasklarge(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
-        return self._aask(msg, self.parametersLarge, self.modelLarge, system_msgs)
+    def aasklarge(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
+        return self._aask(msg, self.modelLarge, system_msgs)
 
-    async def _aask(self, msg: str, parameters, model, system_msgs: Optional[list[str]] = None) -> str:
+    def _aask(self, msg: str, model, system_msgs: Optional[list[str]] = None) -> str:
         if system_msgs:
             message = str(self._system_msgs(system_msgs) + [self._user_msg(msg)])
         else:
             message = self._default_system_msg() + self._user_msg(msg)
-        result = model.predict(msg, **parameters)
 
+        result = model.generate_content(
+            message,
+            generation_config={
+                "max_output_tokens": 8192,
+                "temperature": 0.9,
+                "top_p": 1
+            },
+            safety_settings={
+                  generative_models.HarmCategory.HARM_CATEGORY_HATE_SPEECH: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                  generative_models.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                  generative_models.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+                  generative_models.HarmCategory.HARM_CATEGORY_HARASSMENT: generative_models.HarmBlockThreshold.BLOCK_ONLY_HIGH,
+            },
+            stream=False,
+        )
 
         logger.info(message)
         logger.info(result.text)
         return result.text
 
     async def aaskes(self, msg: str, system_msgs: Optional[list[str]] = None) -> str:
-        logger.info ("Invoking Research Agent :" + CONFIG.es_store_project)
-        GCP_PROJECT = CONFIG.es_store_project  # @param {type: "string"}
+        logger.info ("Invoking Research Agent :" + CONFIG.vertex_project)
+        GCP_PROJECT = CONFIG.vertex_project  # @param {type: "string"}
         SEARCH_ENGINE = CONFIG.es_store  # @param {type: "string"}
-        LLM_MODEL = "text-bison@latest"  # @param {type: "string"}
+        # LLM_MODEL = "text-bison@latest"  # @param {type: "string"}
+        LLM_MODEL = "gemini-1.5-pro"  # @param {type: "string"}
         MAX_OUTPUT_TOKENS = 1024  # @param {type: "integer"}
         TEMPERATURE = 0.0  # @param {type: "number"}
         TOP_P = 0.8  # @param {type: "number"}
@@ -213,7 +195,6 @@ class Palm2:
             max_extractive_answer_count=5,
             get_extractive_answers=True,
             engine_data_type=0,
-
         )
 
         results = retriever.get_relevant_documents(msg)
@@ -223,7 +204,21 @@ class Palm2:
 
         msg = f"Summarize the page_content based on the relevance related to Question: {msg} from the context \n Context: \n Ignore non relevant text" + str(results) + "\n Summarize as Bullets with Source Information Answer:"
         print(msg)
-        result = self.model.predict(msg, **self.parameters)
+
+        PROJECT_ID = CONFIG.vertex_project # @param
+        LOCATION = CONFIG.vertex_location  # @param
+        vertexai.init(project=PROJECT_ID, location=LOCATION)
+        model = GenerativeModel(CONFIG.vertex_model_gemini)
+
+        result = model.generate_content(msg, generation_config={
+                "temperature": 0.01,
+                "top_p": 0.85,
+                "top_k": 20,
+                "candidate_count": 1,
+                "max_output_tokens": 2000,
+                "stop_sequences": ["STOP!"],
+            })
+
 
         if system_msgs:
             message = str(self._system_msgs(system_msgs))
@@ -244,7 +239,7 @@ class Palm2:
         LOCATION = CONFIG.vertex_location  # @param
         vertexai.init(project=PROJECT_ID, location=LOCATION)
 
-        modelgemini=GenerativeModel(CONFIG.vertex_model_mm)
+        modelgemini=GenerativeModel(CONFIG.vertex_model_gemini)
         if system_msgs:
             message = str(self._system_msgs(system_msgs)) + " \n " + str([self._user_msg(msg)])
         else:

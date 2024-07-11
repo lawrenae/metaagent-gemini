@@ -42,12 +42,12 @@ class Action(ABC):
     def __repr__(self):
         return self.__str__()
 
-    async def _aask(self, prompt: str, system_msgs: Optional[list[str]] = None) -> str:
+    def _aask(self, prompt: str, system_msgs: Optional[list[str]] = None) -> str:
         """Append default prefix"""
         if not system_msgs:
             system_msgs = []
         system_msgs.append(self.prefix)
-        return await self.llm.aask(prompt,system_msgs)
+        return self.llm.aask(prompt,system_msgs)
     async def _aaskl(self, prompt: str, system_msgs: Optional[list[str]] = None) -> str:
         """Append default prefix"""
         if not system_msgs:

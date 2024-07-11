@@ -107,7 +107,6 @@ class Config(metaclass=Singleton):
         self.gen_research_subsection = ""
         self.gen_research_questions = ""
         self.es_store = ""
-        self.es_store_project = ""
         self.vertex_project=self._get("GCP_PROJECT_ID")
         self.vertex_location=self._get("GCP_LOCATION")
         self.vertex_model_regular_palm=self._get("GCP_MODEL_REGULAR_PALM")
@@ -166,7 +165,6 @@ class Config(metaclass=Singleton):
         self.gen_research_questions = self._get("CPG_RESEARCH_QUESTIONS")
 
         self.es_store = self._get("GCP_ES_STORE")
-        self.es_store_project = self._get("GCP_ES_PROJECT")
 
         # To Do Port all the Config into Fire Store for Dynamic Agent Configuration
 
