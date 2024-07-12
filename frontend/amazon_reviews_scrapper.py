@@ -10,23 +10,15 @@ headers = {
     "cache-control": "no-cache",
     "dnt": "1",
     "upgrade-insecure-requests": "1",
-    "user-agent": "Mozilla/5.0 (X11; CrOS x86_64 8172.45.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.64 Safari/537.36",
+    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
     "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
     "sec-fetch-site": "none",
     "sec-fetch-mode": "navigate",
     "sec-fetch-dest": "document",
     "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
+    "Sec-Ch-Ua-Platform": "macOS",
+    "sec-ch-a": "\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\"",
 }
-
-URLS = [
-
-    "https://www.amazon.com/Neutrogena-Ultra-Dry-Touch-Sunscreen-Spectrum/product-reviews/B005IHT94S/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews",
-    "https://www.amazon.com/Neutrogena-Ultra-Dry-Touch-Sunscreen-Spectrum/product-reviews/B005IHT94S/ref=cm_cr_arp_d_paging_btm_next_2?ie=UTF8&reviewerType=all_reviews&pageNumber=2",
-    "https://www.amazon.com/Neutrogena-Ultra-Dry-Touch-Sunscreen-Spectrum/product-reviews/B005IHT94S/ref=cm_cr_arp_d_paging_btm_next_3?ie=UTF8&reviewerType=all_reviews&pageNumber=3",
-"https://www.amazon.com/Pipette-Sunscreen-Spectrum-Non-nano-4-Fluid-Ounce/product-reviews/B085Z49QW6/ref=cm_cr_dp_d_show_all_btm?ie=UTF8&reviewerType=all_reviews",
-    "https://www.amazon.com/Pipette-Sunscreen-Spectrum-Non-nano-4-Fluid-Ounce/product-reviews/B085Z49QW6/ref=cm_cr_arp_d_paging_btm_next_2?ie=UTF8&reviewerType=all_reviews&pageNumber=2",
-    "https://www.amazon.com/Pipette-Sunscreen-Spectrum-Non-nano-4-Fluid-Ounce/product-reviews/B085Z49QW6/ref=cm_cr_arp_d_paging_btm_next_3?ie=UTF8&reviewerType=all_reviews&pageNumber=3",
-  ]
 
 
 def get_page_html(page_url: str) -> str:
@@ -80,28 +72,17 @@ def orchestrate_data_gathering(single_review: BeautifulSoup) -> dict:
         "review_date": get_review_date(single_review),
         "review_title": get_review_header(single_review),
         "review_stars": get_number_stars(single_review),
-        "review_flavor": get_product_name(single_review),
+        # "review_flavor": get_product_name(single_review),
     }
 
 
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
+def get_reviews_for(url: str) -> str:
     all_results = []
 
-    for u in URLS:
-        logging.info(u)
-        html = get_page_html(u)
-        reviews = get_reviews_from_html(html)
-        for rev in reviews:
-            data = orchestrate_data_gathering(rev)
-            all_results.append(data)
+    html = get_page_html(url)
+    reviews = get_reviews_from_html(html)
+    for rev in reviews:
+        data = orchestrate_data_gathering(rev)
+        all_results.append(data)
 
-    out = pd.DataFrame.from_records(all_results)
-    if (out.empty):
-        logging.info('Nothing Retrieved')
-
-    else:
-        logging.info(f"{out.shape[0]} Is the shape of the dataframe")
-        save_name = f"{datetime.now().strftime('%Y-%m-%d-%m')}.csv"
-        logging.info(f"saving to {save_name}")
-        out.to_csv(save_name)
+    return all_results
